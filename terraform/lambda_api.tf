@@ -95,6 +95,49 @@ resource "aws_api_gateway_deployment" "dns_manager_deployment" {
   rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
 }
 
+resource "aws_api_gateway_method" "dns_manager_options" {
+  rest_api_id   = aws_api_gateway_rest_api.dns_manager_api.id
+  resource_id   = aws_api_gateway_resource.dns_manager_dns_resource.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "dns_manager_options_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.dns_manager_api.id
+  resource_id             = aws_api_gateway_resource.dns_manager_dns_resource.id
+  http_method             = aws_api_gateway_method.dns_manager_options.http_method
+  type                    = "MOCK"
+  request_templates       = { "application/json" = "{\"statusCode\": 200}" }
+  integration_http_method = "OPTIONS"
+  passthrough_behavior    = "WHEN_NO_MATCH"
+}
+
+resource "aws_api_gateway_method_response" "dns_manager_options_response" {
+  rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
+  resource_id = aws_api_gateway_resource.dns_manager_dns_resource.id
+  http_method = aws_api_gateway_method.dns_manager_options.http_method
+  status_code = "200"
+  response_models = { "application/json" = "Empty" }
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = true,
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "dns_manager_options_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
+  resource_id = aws_api_gateway_resource.dns_manager_dns_resource.id
+  http_method = aws_api_gateway_method.dns_manager_options.http_method
+  status_code = aws_api_gateway_method_response.dns_manager_options_response.status_code
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'",
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'",
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST,GET,DELETE'"
+  }
+  response_templates = { "application/json" = "" }
+}
+
 output "dns_manager_api_url" {
   value = "https://${aws_api_gateway_rest_api.dns_manager_api.id}.execute-api.${data.aws_region.current.region}.amazonaws.com/prod/api/dns"
 }
