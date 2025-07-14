@@ -129,7 +129,7 @@ resource "aws_api_gateway_method_response" "dns_manager_options_response" {
 }
 
 resource "aws_api_gateway_integration_response" "dns_manager_options_integration_response" {
-  depends_on = [aws_api_gateway_integration.dns_manager_options_integration]
+  depends_on  = [aws_api_gateway_integration.dns_manager_options_integration]
   rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
   resource_id = aws_api_gateway_resource.dns_manager_dns_resource.id
   http_method = aws_api_gateway_method.dns_manager_options.http_method
