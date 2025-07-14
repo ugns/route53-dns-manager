@@ -87,7 +87,7 @@ resource "aws_lambda_permission" "allow_apigw" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.dns_manager.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.dns_manager_api.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_stage.production.execution_arn}/*"
 }
 
 resource "aws_api_gateway_deployment" "dns_manager_deployment" {
@@ -153,6 +153,6 @@ resource "aws_api_gateway_stage" "production" {
   
 }
 output "dns_manager_api_url" {
-  value = "https://${aws_api_gateway_rest_api.dns_manager_api.id}.execute-api.${data.aws_region.current.region}.amazonaws.com/prod/api/dns"
+  value = "${aws_api_gateway_stage.production.invoke_url}/api/dns"
 }
 

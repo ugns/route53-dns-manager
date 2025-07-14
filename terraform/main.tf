@@ -7,13 +7,13 @@ resource "aws_amplify_app" "website" {
 
   environment_variables = {
     REACT_APP_GOOGLE_CLIENT_ID = var.google_client_id
-    REACT_APP_DNS_API_URL      = "https://${aws_api_gateway_rest_api.dns_manager_api.id}.execute-api.${data.aws_region.current.region}.amazonaws.com/prod/api/dns"
+    REACT_APP_DNS_API_URL      = "${aws_api_gateway_stage.production.invoke_url}/api/dns"
   }
 
   custom_rule {
     source = "/<*>"
-    status = "404"
-    target = "/404.html"
+    status = "200"
+    target = "/index.html"
   }
 }
 
