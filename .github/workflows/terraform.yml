@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'terraform/**'
+      - 'amplify/backend/function/dnsManager/**'
   pull_request:
     branches:
       - main
+    paths:
+      - 'terraform/**'
+      - 'amplify/backend/function/dnsManager/**'
     types: [assigned, opened, synchronize, reopened]
 
 env:
