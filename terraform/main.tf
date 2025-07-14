@@ -9,7 +9,7 @@ resource "aws_amplify_app" "website" {
     GOOGLE_CLIENT_ID = var.google_client_id
     HOSTED_ZONE_ID   = aws_route53_zone.this.zone_id
     DNS_DOMAIN       = var.domain_name
-    AWS_REGION       = data.aws_region.current.name
+    AWS_REGION       = data.aws_region.current.region
   }
  
   custom_rule {
