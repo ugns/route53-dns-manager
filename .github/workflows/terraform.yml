@@ -44,10 +44,15 @@ jobs:
         role-to-assume:  ${{ env.AWS_GITHUB_OIDC_ROLE }}
         aws-region: us-east-1
 
-    - name: Debug OIDC Claims
-      uses: github/actions-oidc-debugger@main
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        audience: '${{ github.server_url }}/${{ github.repository_owner }}'
+        node-version: '18'
+
+    - name: Install Lambda dependencies
+      run: |
+        cd amplify/backend/function/dnsManager
+        npm install
 
     - name: Terraform Format
       id: fmt
