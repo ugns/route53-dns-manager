@@ -1,0 +1,16 @@
+{
+  "name": "route53-dns-manager-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "google-auth-library": "^9.0.0",
+    "aws-sdk": "^2.1480.0",
+    "cors": "^2.8.5"
+  }
+}

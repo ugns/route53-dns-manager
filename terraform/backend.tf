@@ -1,0 +1,14 @@
+terraform {
+  required_version = ">= 1.0.0"
+
+  backend "s3" {
+    region         = "us-east-1"
+    bucket         = "ugns-use1-terraform-state"
+    key            = "osceola-ares-website/terraform.tfstate"
+    dynamodb_table = "ugns-use1-terraform-state-lock"
+    encrypt        = "true"
+    assume_role = {
+      role_arn = "arn:aws:iam::465691465286:role/GitHubActionsExecution"
+    }
+  }
+}
