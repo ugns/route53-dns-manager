@@ -183,7 +183,17 @@ exports.handler = async (event) => {
         .filter(r => r.Type === 'TXT' && r.ResourceRecords.some(rec => rec.Value.replace(/^"|"$/g, '') === user.sub))
         .map(r => {
           const hostname = r.Name.replace(`.${DOMAIN}.`, '').replace(/\.$/, '');
-          return { hostname, did: null };
+          // Find the corresponding _atproto TXT record
+          const atprotoName = `_atproto.${hostname}.${DOMAIN}.`;
+          const atprotoRecord = data.ResourceRecordSets.find(
+            rec => rec.Name === atprotoName && rec.Type === 'TXT'
+          );
+          let did = null;
+          if (atprotoRecord && atprotoRecord.ResourceRecords.length > 0) {
+            const match = atprotoRecord.ResourceRecords[0].Value.match(/did=([^\"]+)/);
+            if (match) did = match[1];
+          }
+          return { hostname, did };
         });
       console.log('User entries:', userEntries);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify(userEntries) };
