@@ -94,7 +94,7 @@ resource "aws_api_gateway_deployment" "dns_manager_deployment" {
   depends_on  = [aws_api_gateway_integration.dns_manager_integration]
   rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
   triggers = {
-    lambda_hash = data.archive_file.dns_manager_zip.output_base64sha256
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.dns_manager_api.body))
   }
 }
 
@@ -142,6 +142,16 @@ resource "aws_api_gateway_integration_response" "dns_manager_options_integration
   response_templates = { "application/json" = "" }
 }
 
+resource "aws_api_gateway_stage" "production" {
+  rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
+  stage_name  = "prod"
+  deployment_id = aws_api_gateway_deployment.dns_manager_deployment.id
+
+  variables = {
+    lambda_function_name = aws_lambda_function.dns_manager.function_name
+  }
+  
+}
 output "dns_manager_api_url" {
   value = "https://${aws_api_gateway_rest_api.dns_manager_api.id}.execute-api.${data.aws_region.current.region}.amazonaws.com/prod/api/dns"
 }
