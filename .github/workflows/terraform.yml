@@ -50,8 +50,8 @@ jobs:
         node-version: '18'
 
     - name: Install Lambda dependencies
+      working-directory: amplify/backend/function/dnsManager
       run: |
-        cd amplify/backend/function/dnsManager
         npm install
 
     - name: Terraform Format
