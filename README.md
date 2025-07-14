@@ -1,70 +1,64 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Route53 DNS Manager
 
-## Available Scripts
+This is a full-stack web application for managing DNS records in AWS Route53, with Google OAuth authentication and Bluesky DID verification.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **Google OAuth**: Users authenticate via Google to manage their DNS records.
+- **Bluesky DID Verification**: Validates DIDs against the PLC directory before allowing DNS record creation.
+- **DNS Management**: Create, update, and delete TXT records in Route53 for custom hostnames under your domain.
+- **Ownership Enforcement**: Only the creator (Google user) can update or remove their own DNS records.
+- **Stateless Ownership**: Ownership is stored as a TXT record in Route53, no database required.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Project Structure
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- `src/`: React frontend (Google login, DNS form, record listing)
+- `server/`: Express backend (Google token verification, Route53 integration)
+- `terraform/`: Infrastructure as code for AWS Amplify, Route53, and domain setup
+- `amplify.yml`: Amplify build configuration for frontend and backend
 
-### `npm test`
+## Environment Variables
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Set these in your Amplify environment or `.env` files:
 
-### `npm run build`
+- `GOOGLE_CLIENT_ID`: Google OAuth client ID
+- `HOSTED_ZONE_ID`: Route53 hosted zone ID
+- `DNS_DOMAIN`: Your domain name
+- `AWS_REGION`: AWS region (default: us-east-1)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Deployment
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Deployment is automated via AWS Amplify and Terraform:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Terraform** provisions Amplify, Route53, and domain resources, and sets environment variables.
+2. **Amplify** builds and deploys both frontend and backend, passing environment variables to each.
 
-### `npm run eject`
+## Usage
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Login with Google.
+2. Enter your Bluesky DID and desired hostname.
+3. Submit to create or update a DNS TXT record for `_atproto.<hostname>.<domain>` (DID) and `<hostname>.<domain>` (ownership).
+4. Only the creator can update or remove their records.
+5. Records are validated for DID format and existence in the PLC directory.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Development
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Frontend
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm install
+npm start
+```
 
-## Learn More
+### Backend
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+cd server
+npm install
+npm start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## License
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT
