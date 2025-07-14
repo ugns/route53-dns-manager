@@ -1,4 +1,4 @@
-const AWS = require('aws-sdk');
+const { Route53 } = require('@aws-sdk/client-route-53');
 const axios = require('axios');
 const { OAuth2Client } = require('google-auth-library');
 
@@ -6,7 +6,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const HOSTED_ZONE_ID = process.env.HOSTED_ZONE_ID;
 const DOMAIN = process.env.DNS_DOMAIN;
 const oauthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
-const route53 = new AWS.Route53();
+const route53 = new Route53();
 
 async function getTxtRecord(name) {
   const params = {
@@ -15,7 +15,7 @@ async function getTxtRecord(name) {
     StartRecordType: 'TXT',
     MaxItems: '1',
   };
-  const data = await route53.listResourceRecordSets(params).promise();
+  const data = await route53.listResourceRecordSets(params);
   const record = data.ResourceRecordSets.find(r => r.Name.replace(/\.$/, '') === name && r.Type === 'TXT');
   if (record && record.ResourceRecords.length > 0) {
     return record.ResourceRecords[0].Value.replace(/^"|"$/g, '');
@@ -93,7 +93,7 @@ exports.handler = async (event) => {
         },
       ];
       const params = { HostedZoneId: HOSTED_ZONE_ID, ChangeBatch: { Changes: changes } };
-      await route53.changeResourceRecordSets(params).promise();
+      await route53.changeResourceRecordSets(params);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
     } catch (err) {
       return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid token or AWS error', details: err.message }) };
@@ -133,7 +133,7 @@ exports.handler = async (event) => {
         },
       ];
       const params = { HostedZoneId: HOSTED_ZONE_ID, ChangeBatch: { Changes: changes } };
-      await route53.changeResourceRecordSets(params).promise();
+      await route53.changeResourceRecordSets(params);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
     } catch (err) {
       return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid token or AWS error', details: err.message }) };
@@ -147,7 +147,7 @@ exports.handler = async (event) => {
       const ticket = await oauthClient.verifyIdToken({ idToken: token, audience: GOOGLE_CLIENT_ID });
       const user = ticket.getPayload();
       const params = { HostedZoneId: HOSTED_ZONE_ID, MaxItems: '100' };
-      const data = await route53.listResourceRecordSets(params).promise();
+      const data = await route53.listResourceRecordSets(params);
       const userEntries = data.ResourceRecordSets
         .filter(r => r.Type === 'TXT' && r.ResourceRecords.some(rec => rec.Value.replace(/^"|"$/g, '') === user.sub))
         .map(r => {
