@@ -43,10 +43,11 @@ const corsHeaders = {
 };
 
 exports.handler = async (event) => {
+  console.log('Received event:', JSON.stringify(event));
   const method = event.httpMethod;
   let body = {};
   if (event.body) {
-    try { body = JSON.parse(event.body); } catch {}
+    try { body = JSON.parse(event.body); } catch (err) { console.error('Error parsing body:', err); }
   }
   const query = event.queryStringParameters || {};
 
@@ -60,16 +61,29 @@ exports.handler = async (event) => {
 
   if (method === 'POST') {
     const { token, did, hostname } = body;
-    if (!token || !did || !hostname) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing fields' }) };
-    if (!isValidDidFormat(did)) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid DID format' }) };
-    if (!(await isValidDidPlc(did))) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'DID not found in PLC directory' }) };
+    console.log('POST request body:', body);
+    if (!token || !did || !hostname) {
+      console.warn('Missing fields:', { token, did, hostname });
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing fields' }) };
+    }
+    if (!isValidDidFormat(did)) {
+      console.warn('Invalid DID format:', did);
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid DID format' }) };
+    }
+    if (!(await isValidDidPlc(did))) {
+      console.warn('DID not found in PLC directory:', did);
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'DID not found in PLC directory' }) };
+    }
     try {
       const ticket = await oauthClient.verifyIdToken({ idToken: token, audience: GOOGLE_CLIENT_ID });
       const user = ticket.getPayload();
+      console.log('Authenticated user:', user);
       const fqdn = `${hostname}.${DOMAIN}`;
       const atprotoFqdn = `_atproto.${hostname}.${DOMAIN}`;
       const ownerTxt = await getTxtRecord(fqdn);
+      console.log('Existing ownerTxt:', ownerTxt);
       if (ownerTxt && ownerTxt !== user.sub) {
+        console.warn('Not authorized to update entry:', { ownerTxt, userSub: user.sub });
         return { statusCode: 403, headers: corsHeaders, body: JSON.stringify({ error: 'Not authorized to update this entry' }) };
       }
       const changes = [
@@ -93,23 +107,32 @@ exports.handler = async (event) => {
         },
       ];
       const params = { HostedZoneId: HOSTED_ZONE_ID, ChangeBatch: { Changes: changes } };
+      console.log('Route53 change params:', params);
       await route53.changeResourceRecordSets(params);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
     } catch (err) {
+      console.error('POST error:', err);
       return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid token or AWS error', details: err.message }) };
     }
   }
 
   if (method === 'DELETE') {
     const { token, hostname } = body;
-    if (!token || !hostname) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing fields' }) };
+    console.log('DELETE request body:', body);
+    if (!token || !hostname) {
+      console.warn('Missing fields:', { token, hostname });
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing fields' }) };
+    }
     try {
       const ticket = await oauthClient.verifyIdToken({ idToken: token, audience: GOOGLE_CLIENT_ID });
       const user = ticket.getPayload();
+      console.log('Authenticated user:', user);
       const fqdn = `${hostname}.${DOMAIN}`;
       const atprotoFqdn = `_atproto.${hostname}.${DOMAIN}`;
       const ownerTxt = await getTxtRecord(fqdn);
+      console.log('Existing ownerTxt:', ownerTxt);
       if (!ownerTxt || ownerTxt !== user.sub) {
+        console.warn('Not authorized or entry does not exist:', { ownerTxt, userSub: user.sub });
         return { statusCode: 403, headers: corsHeaders, body: JSON.stringify({ error: 'Not authorized or entry does not exist' }) };
       }
       const changes = [
@@ -133,29 +156,39 @@ exports.handler = async (event) => {
         },
       ];
       const params = { HostedZoneId: HOSTED_ZONE_ID, ChangeBatch: { Changes: changes } };
+      console.log('Route53 change params:', params);
       await route53.changeResourceRecordSets(params);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
     } catch (err) {
+      console.error('DELETE error:', err);
       return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid token or AWS error', details: err.message }) };
     }
   }
 
   if (method === 'GET') {
     const { token } = query;
-    if (!token) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing token' }) };
+    console.log('GET request query:', query);
+    if (!token) {
+      console.warn('Missing token in GET request');
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing token' }) };
+    }
     try {
       const ticket = await oauthClient.verifyIdToken({ idToken: token, audience: GOOGLE_CLIENT_ID });
       const user = ticket.getPayload();
+      console.log('Authenticated user:', user);
       const params = { HostedZoneId: HOSTED_ZONE_ID, MaxItems: '100' };
       const data = await route53.listResourceRecordSets(params);
+      console.log('Route53 listResourceRecordSets data:', data);
       const userEntries = data.ResourceRecordSets
         .filter(r => r.Type === 'TXT' && r.ResourceRecords.some(rec => rec.Value.replace(/^"|"$/g, '') === user.sub))
         .map(r => {
           const hostname = r.Name.replace(`.${DOMAIN}.`, '').replace(/\.$/, '');
           return { hostname, did: null };
         });
+      console.log('User entries:', userEntries);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify(userEntries) };
     } catch (err) {
+      console.error('GET error:', err);
       return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid token', details: err.message }) };
     }
   }
