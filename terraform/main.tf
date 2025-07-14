@@ -11,9 +11,27 @@ resource "aws_amplify_app" "website" {
   }
 
   custom_rule {
-    source = "/<*>"
+    source = "/static/<*>"
+    target = "/static/<*>"
     status = "200"
+  }
+
+  custom_rule {
+    source = "/favicon.ico"
+    target = "/favicon.ico"
+    status = "200"
+  }
+
+  custom_rule {
+    source = "/manifest.json"
+    target = "/manifest.json"
+    status = "200"
+  }
+
+  custom_rule {
+    source = "/<*>"
     target = "/index.html"
+    status = "200"
   }
 }
 
