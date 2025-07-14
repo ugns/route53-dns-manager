@@ -3,8 +3,8 @@ resource "aws_iam_role" "lambda_dns_manager" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
       Principal = { Service = "lambda.amazonaws.com" }
     }]
   })
@@ -25,8 +25,8 @@ resource "aws_iam_role_policy" "lambda_dns_manager_policy" {
         Resource = "*"
       },
       {
-        Effect = "Allow"
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = "arn:aws:logs:*:*:*"
       }
     ]
@@ -91,7 +91,7 @@ resource "aws_lambda_permission" "allow_apigw" {
 }
 
 resource "aws_api_gateway_deployment" "dns_manager_deployment" {
-  depends_on = [aws_api_gateway_integration.dns_manager_integration]
+  depends_on  = [aws_api_gateway_integration.dns_manager_integration]
   rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
 }
 
