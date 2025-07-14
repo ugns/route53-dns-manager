@@ -75,6 +75,7 @@ jobs:
         TF_VAR_gh_action_role: ${{ env.AWS_GITHUB_ACTIONS_ROLE }}
         TF_VAR_gh_access_token: ${{ steps.generate_token.outputs.token }}
         TF_VAR_google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
+        TF_VAR_repository: "${{ github.server_url }}/${{ github.repository }}"
       run: terraform plan -out .planfile
 
     - name: Post PR comment
