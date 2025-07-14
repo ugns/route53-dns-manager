@@ -93,6 +93,9 @@ resource "aws_lambda_permission" "allow_apigw" {
 resource "aws_api_gateway_deployment" "dns_manager_deployment" {
   depends_on  = [aws_api_gateway_integration.dns_manager_integration]
   rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
+  triggers = {
+    lambda_hash = data.archive_file.dns_manager_zip.output_base64sha256
+  }
 }
 
 resource "aws_api_gateway_method" "dns_manager_options" {
