@@ -9,6 +9,7 @@ resource "aws_amplify_app" "website" {
     GOOGLE_CLIENT_ID = var.google_client_id
     HOSTED_ZONE_ID   = aws_route53_zone.this.zone_id
     DNS_DOMAIN       = var.domain_name
+    REACT_APP_DNS_API_URL = aws_api_gateway_deployment.dns_manager_deployment.invoke_url != null ? "${aws_api_gateway_deployment.dns_manager_deployment.invoke_url}/api/dns" : ""
   }
  
   custom_rule {
