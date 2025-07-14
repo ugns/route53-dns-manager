@@ -7,34 +7,39 @@ function DnsForm({ token }) {
   const [entries, setEntries] = useState([]);
   const [message, setMessage] = useState('');
 
+
+  const API_URL = process.env.REACT_APP_DNS_API_URL;
+
   useEffect(() => {
-    if (token) {
-      axios.get('http://localhost:4000/api/dns', { params: { token } })
+    if (token && API_URL) {
+      axios.get(API_URL, { params: { token } })
         .then(res => setEntries(res.data))
         .catch(() => setEntries([]));
     }
-  }, [token]);
+  }, [token, API_URL]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     try {
-      await axios.post('http://localhost:4000/api/dns', { token, did, hostname });
+      await axios.post(API_URL, { token, did, hostname });
       setMessage('DNS entry created/updated!');
       setDid('');
       setHostname('');
       // Refresh entries
-      const res = await axios.get('http://localhost:4000/api/dns', { params: { token } });
+      const res = await axios.get(API_URL, { params: { token } });
       setEntries(res.data);
     } catch (err) {
       setMessage(err.response?.data?.error || 'Error');
     }
   };
 
+
   const handleRemove = async (h) => {
     setMessage('');
     try {
-      await axios.delete('http://localhost:4000/api/dns', { data: { token, hostname: h } });
+      await axios.delete(API_URL, { data: { token, hostname: h } });
       setMessage('DNS entry removed!');
       setEntries(entries.filter(e => e.hostname !== h));
     } catch (err) {

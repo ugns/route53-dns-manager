@@ -1,0 +1,10 @@
+{
+  "name": "dnsManager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1480.0",
+    "axios": "^1.6.0",
+    "google-auth-library": "^9.0.0"
+  }
+}
