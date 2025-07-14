@@ -116,13 +116,13 @@ resource "aws_api_gateway_integration" "dns_manager_options_integration" {
 }
 
 resource "aws_api_gateway_method_response" "dns_manager_options_response" {
-  rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
-  resource_id = aws_api_gateway_resource.dns_manager_dns_resource.id
-  http_method = aws_api_gateway_method.dns_manager_options.http_method
-  status_code = "200"
+  rest_api_id     = aws_api_gateway_rest_api.dns_manager_api.id
+  resource_id     = aws_api_gateway_resource.dns_manager_dns_resource.id
+  http_method     = aws_api_gateway_method.dns_manager_options.http_method
+  status_code     = "200"
   response_models = { "application/json" = "Empty" }
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true,
     "method.response.header.Access-Control-Allow-Headers" = true,
     "method.response.header.Access-Control-Allow-Methods" = true
   }
@@ -134,7 +134,7 @@ resource "aws_api_gateway_integration_response" "dns_manager_options_integration
   http_method = aws_api_gateway_method.dns_manager_options.http_method
   status_code = aws_api_gateway_method_response.dns_manager_options_response.status_code
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = "'*'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'",
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'",
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST,GET,DELETE'"
   }
