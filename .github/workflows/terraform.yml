@@ -49,6 +49,14 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Cache Lambda node_modules
+      uses: actions/cache@v4
+      with:
+        path: amplify/backend/function/dnsManager/node_modules
+        key: lambda-node-modules-${{ hashFiles('amplify/backend/function/dnsManager/package-lock.json') }}
+        restore-keys: |
+          lambda-node-modules-
+
     - name: Install Lambda dependencies
       working-directory: amplify/backend/function/dnsManager
       run: |
