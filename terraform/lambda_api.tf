@@ -96,5 +96,6 @@ resource "aws_api_gateway_deployment" "dns_manager_deployment" {
 }
 
 output "dns_manager_api_url" {
-  value = "${aws_api_gateway_deployment.dns_manager_deployment.invoke_url}/api/dns"
+  value = "https://${aws_api_gateway_rest_api.dns_manager_api.id}.execute-api.${data.aws_region.current.region}.amazonaws.com/prod/api/dns"
 }
+
