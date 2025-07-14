@@ -143,14 +143,14 @@ resource "aws_api_gateway_deployment" "dns_manager_deployment" {
 # }
 
 resource "aws_api_gateway_stage" "production" {
-  rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
-  stage_name  = "prod"
+  rest_api_id   = aws_api_gateway_rest_api.dns_manager_api.id
+  stage_name    = "prod"
   deployment_id = aws_api_gateway_deployment.dns_manager_deployment.id
 
   variables = {
     lambda_function_name = aws_lambda_function.dns_manager.function_name
   }
-  
+
 }
 output "dns_manager_api_url" {
   value = "${aws_api_gateway_stage.production.invoke_url}/api/dns"
