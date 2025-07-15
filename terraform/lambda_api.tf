@@ -107,10 +107,15 @@ resource "aws_lambda_permission" "allow_apigw" {
 }
 
 resource "aws_api_gateway_deployment" "dns_manager_deployment" {
-  depends_on  = [aws_api_gateway_integration.dns_manager_integration]
+  depends_on = [
+    aws_api_gateway_integration.dns_manager_integration,
+    aws_api_gateway_integration.dns_manager_options_integration
+  ]
   rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.dns_manager_api.body))
+    manager        = aws_api_gateway_integration.dns_manager_integration.resource_id
+    options        = aws_api_gateway_integration.dns_manager_options_integration.resource_id
+    lambda_version = aws_lambda_function.dns_manager.version
   }
 }
 
