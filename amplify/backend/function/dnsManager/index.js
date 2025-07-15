@@ -176,7 +176,7 @@ exports.handler = async (event) => {
       const ticket = await oauthClient.verifyIdToken({ idToken: token, audience: GOOGLE_CLIENT_ID });
       const user = ticket.getPayload();
       console.log('Authenticated user:', user);
-      const params = { HostedZoneId: HOSTED_ZONE_ID, MaxItems: '100' };
+      const params = { HostedZoneId: HOSTED_ZONE_ID, MaxItems: '100', StartRecordType: 'TXT' };
       const data = await route53.listResourceRecordSets(params);
       console.log('Route53 listResourceRecordSets data:', data);
       const userEntries = data.ResourceRecordSets
