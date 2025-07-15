@@ -9,30 +9,6 @@ resource "aws_amplify_app" "website" {
     REACT_APP_GOOGLE_CLIENT_ID = var.google_client_id
     REACT_APP_DNS_API_URL      = "${aws_api_gateway_stage.production.invoke_url}/api/dns"
   }
-
-  # custom_rule {
-  #   source = "/static/<*>"
-  #   target = "/static/<*>"
-  #   status = "200"
-  # }
-
-  # custom_rule {
-  #   source = "/favicon.ico"
-  #   target = "/favicon.ico"
-  #   status = "200"
-  # }
-
-  # custom_rule {
-  #   source = "/manifest.json"
-  #   target = "/manifest.json"
-  #   status = "200"
-  # }
-
-  # custom_rule {
-  #   source = "/<*>"
-  #   target = "/index.html"
-  #   status = "200"
-  # }
 }
 
 resource "aws_amplify_branch" "main" {
