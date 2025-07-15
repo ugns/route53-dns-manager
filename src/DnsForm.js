@@ -6,15 +6,17 @@ function DnsForm({ token }) {
   const [hostname, setHostname] = useState('');
   const [entries, setEntries] = useState([]);
   const [message, setMessage] = useState('');
-
+  const [loading, setLoading] = useState(false);
 
   const API_URL = process.env.REACT_APP_DNS_API_URL;
 
   useEffect(() => {
     if (token && API_URL) {
+      setLoading(true);
       axios.get(API_URL, { params: { token } })
         .then(res => setEntries(res.data))
-        .catch(() => setEntries([]));
+        .catch(() => setEntries([]))
+        .finally(() => setLoading(false));
     }
   }, [token, API_URL]);
 
@@ -62,7 +64,7 @@ function DnsForm({ token }) {
 
   return (
     <>
-      <h2 className="card-title mb-3 text-center">Manage DNS Entry</h2>
+      <div className="card-title mb-3 h2 text-center">Manage DNS Entry</div>
       <form onSubmit={handleSubmit} className="mb-3">
         <div className="mb-3">
           <label htmlFor="did-input" className="form-label">Bluesky DID</label>
@@ -106,35 +108,59 @@ function DnsForm({ token }) {
         </div>
         <button type="submit" className="btn btn-primary w-100">Create/Update</button>
       </form>
-      {message && <div className="alert alert-info text-center">{message}</div>}
-      <h3 className="mt-4">Your DNS Entries</h3>
-      <ul className="list-group">
-        {entries.map(e => (
-          <li
-            key={e.hostname}
-            className="list-group-item d-flex justify-content-between align-items-center"
-          >
-            <span><strong>{e.hostname}</strong>: {e.did}</span>
-            <div className="btn-group" role="group">
-              <button
-                type="button"
-                className="btn btn-outline-secondary btn-sm"
-                aria-label="Edit entry: Click to populate form for editing"
-                onClick={() => {
-                  setHostname(e.hostname);
-                  setDid(e.did);
-                }}
-              >Edit</button>
-              <button
-                type="button"
-                className="btn btn-outline-danger btn-sm"
-                aria-label={`Remove entry for ${e.hostname}`}
-                onClick={() => handleRemove(e.hostname)}
-              >Remove</button>
+      <div
+        className={`toast align-items-center text-bg-info border-0 position-fixed top-0 start-50 translate-middle-x mt-3${message ? ' show' : ''}`}
+        role="alert"
+        aria-live="polite"
+        aria-atomic="true"
+        style={{ zIndex: 1055, minWidth: '250px' }}
+      >
+        <div className="d-flex">
+          <div className="toast-body w-100 text-center">
+            {message}
+          </div>
+        </div>
+      </div>
+      <div className="card shadow-sm">
+        <div className="card-header mb-3 h4 text-center">Your DNS Entries</div>
+        <div className="card-body p-0">
+          {loading ? (
+            <div className="d-flex justify-content-center py-4">
+              <div className="spinner-border text-primary" role="status" aria-label="Loading entries">
+                <span className="visually-hidden">Loading...</span>
+              </div>
             </div>
-          </li>
-        ))}
-      </ul>
+          ) : (
+            <ul className="list-group list-group-flush">
+              {entries.map(e => (
+                <li
+                  key={e.hostname}
+                  className="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  <span><strong>{e.hostname}</strong>: {e.did}</span>
+                  <div className="btn-group" role="group">
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary btn-sm"
+                      aria-label="Edit entry: Click to populate form for editing"
+                      onClick={() => {
+                        setHostname(e.hostname);
+                        setDid(e.did);
+                      }}
+                    >Edit</button>
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger btn-sm"
+                      aria-label={`Remove entry for ${e.hostname}`}
+                      onClick={() => handleRemove(e.hostname)}
+                    >Remove</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </>
   );
 }
