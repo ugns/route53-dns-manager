@@ -47,37 +47,64 @@ function DnsForm({ token }) {
     }
   };
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000); // 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   return (
-    <div>
-      <h2>Manage DNS Entry</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Bluesky DID"
-          value={did}
-          onChange={e => setDid(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Desired Hostname"
-          value={hostname}
-          onChange={e => setHostname(e.target.value)}
-          required
-        />
-        <button type="submit">Create/Update</button>
+    <>
+      <h2 className="card-title mb-3 text-center">Manage DNS Entry</h2>
+      <form onSubmit={handleSubmit} className="mb-3">
+        <div className="mb-3">
+          <label htmlFor="did-input" className="form-label">Bluesky DID</label>
+          <input
+            type="text"
+            id="did-input"
+            className="form-control"
+            placeholder="e.g. did:plc:123456789012345678901234"
+            value={did}
+            onChange={e => setDid(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="handle-input" className="form-label">Desired Handle</label>
+          <div className="input-group">
+            <span className="input-group-text bg-white border-end-0 fw-semibold" id="handle-addon">
+              {/* Bootstrap @ icon */}
+              <i className="bi bi-at"></i>
+            </span>
+            <input
+              type="text"
+              id="handle-input"
+              className="form-control border-top border-bottom border-0"
+              placeholder="e.g. alice"
+              value={hostname}
+              onChange={e => setHostname(e.target.value)}
+              required
+              aria-describedby="handle-addon domain-addon"
+            />
+            <span className="input-group-text bg-white border-start-0 fw-semibold" id="domain-addon">
+              {process.env.REACT_APP_DNS_DOMAIN ? `.${process.env.REACT_APP_DNS_DOMAIN}` : '.yourdomain.com'}
+            </span>
+          </div>
+        </div>
+        <button type="submit" className="btn btn-primary w-100">Create/Update</button>
       </form>
-      {message && <p>{message}</p>}
-      <h3>Your DNS Entries</h3>
-      <ul>
+      {message && <div className="alert alert-info text-center">{message}</div>}
+      <h3 className="mt-4">Your DNS Entries</h3>
+      <ul className="list-group">
         {entries.map(e => (
-          <li key={e.hostname}>
-            {e.hostname}: {e.did}
-            <button onClick={() => handleRemove(e.hostname)}>Remove</button>
+          <li key={e.hostname} className="list-group-item d-flex justify-content-between align-items-center">
+            <span><strong>{e.hostname}</strong>: {e.did}</span>
+            <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(e.hostname)}>Remove</button>
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 }
 

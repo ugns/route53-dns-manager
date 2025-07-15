@@ -9,8 +9,9 @@ function GoogleLoginWrapper() {
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <div>
-        {!token ? (
+      {!token ? (
+        <>
+          <h2 className="mb-4 text-center">Manage Bluesky Handle DNS</h2>
           <GoogleLogin
             onSuccess={credentialResponse => {
               setToken(credentialResponse.credential);
@@ -19,10 +20,10 @@ function GoogleLoginWrapper() {
               alert('Login Failed');
             }}
           />
-        ) : (
-          <DnsForm token={token} />
-        )}
-      </div>
+        </>
+      ) : (
+        <DnsForm token={token} />
+      )}
     </GoogleOAuthProvider>
   );
 }
