@@ -7,6 +7,11 @@ const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 function GoogleLoginWrapper() {
   const [token, setToken] = useState(null);
 
+  React.useEffect(() => {
+    const storedToken = localStorage.getItem('googleToken');
+    if (storedToken) setToken(storedToken);
+  }, []);
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       {!token ? (
@@ -16,16 +21,31 @@ function GoogleLoginWrapper() {
             <GoogleLogin
               onSuccess={credentialResponse => {
                 setToken(credentialResponse.credential);
+                localStorage.setItem('googleToken', credentialResponse.credential);
               }}
               onError={() => {
                 alert('Login Failed');
               }}
+              context='signin'
               useOneTap
             />
           </div>
         </>
       ) : (
-        <DnsForm token={token} />
+        <>
+          <div className="d-flex justify-content-end mb-3">
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => {
+                setToken(null);
+                localStorage.removeItem('googleToken');
+              }}
+              aria-label="Log out of Google session"
+            >Log Out</button>
+          </div>
+          <DnsForm token={token} />
+        </>
       )}
     </GoogleOAuthProvider>
   );
