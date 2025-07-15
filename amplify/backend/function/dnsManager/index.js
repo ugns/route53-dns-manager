@@ -46,12 +46,6 @@ const corsHeaders = {
 exports.handler = async (event) => {
   console.log('Received event:', JSON.stringify(event));
   const method = event.httpMethod;
-  let body = {};
-  if (event.body) {
-    try { body = JSON.parse(event.body); } catch (err) { console.error('Error parsing body:', err); }
-  }
-  const query = event.queryStringParameters || {};
-
   if (method === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -59,6 +53,11 @@ exports.handler = async (event) => {
       body: ''
     };
   }
+  let body = {};
+  if (event.body) {
+    try { body = JSON.parse(event.body); } catch (err) { console.error('Error parsing body:', err); }
+  }
+  const query = event.queryStringParameters || {};
 
   if (method === 'POST') {
     const { token, did, hostname } = body;
