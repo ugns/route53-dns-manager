@@ -70,10 +70,13 @@ function DnsForm({ token }) {
             type="text"
             id="did-input"
             className="form-control"
+            aria-label="Enter your Bluesky DID value"
             placeholder="e.g. did:plc:123456789012345678901234"
             value={did}
             onChange={e => setDid(e.target.value)}
             required
+            onInvalid={e => e.target.setCustomValidity('Please enter your Bluesky DID (e.g. did:plc:...)')}
+            onInput={e => e.target.setCustomValidity('')}
           />
         </div>
         <div className="mb-3">
@@ -87,11 +90,14 @@ function DnsForm({ token }) {
               type="text"
               id="handle-input"
               className="form-control border-top border-bottom border-0"
+              aria-label="Enter the desired handle"
               placeholder="e.g. alice"
               value={hostname}
               onChange={e => setHostname(e.target.value)}
               required
               aria-describedby="handle-addon domain-addon"
+              onInvalid={e => e.target.setCustomValidity('Please enter your desired handle (e.g. alice)')}
+              onInput={e => e.target.setCustomValidity('')}
             />
             <span className="input-group-text border-start-0 fw-semibold" id="domain-addon">
               {process.env.REACT_APP_DNS_DOMAIN ? `.${process.env.REACT_APP_DNS_DOMAIN}` : '.yourdomain.com'}

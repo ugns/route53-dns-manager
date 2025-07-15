@@ -20,6 +20,7 @@ function GoogleLoginWrapper() {
               onError={() => {
                 alert('Login Failed');
               }}
+              useOneTap
             />
           </div>
         </>
