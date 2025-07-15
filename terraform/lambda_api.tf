@@ -114,7 +114,7 @@ resource "aws_api_gateway_deployment" "dns_manager_deployment" {
   ]
   rest_api_id = aws_api_gateway_rest_api.dns_manager_api.id
   triggers = {
-    lambda_version = aws_lambda_function.dns_manager.qualified_invoke_arn
+    lambda = aws_lambda_function.dns_manager.code_sha256
   }
 
   lifecycle {
