@@ -26,8 +26,12 @@ function GoogleLoginWrapper() {
               onError={() => {
                 alert('Login Failed');
               }}
+              theme='filled_blue'
               context='signin'
-              useOneTap
+              ux_mode='popup'
+              itp_support={true}
+              use_fedcm_for_button={true}
+              use_fedcm_for_prompt={true}
             />
           </div>
         </>
