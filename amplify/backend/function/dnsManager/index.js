@@ -60,8 +60,8 @@ exports.handler = async (event) => {
   }
 
   if (method === 'POST') {
-    const { token, did, hostname } = body;
-    console.log('POST request body:', body);
+    const { token, did, hostname } = query;
+    console.log('POST request body:', query);
     if (!token || !did || !hostname) {
       console.warn('Missing fields:', { token, did, hostname });
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing fields' }) };
