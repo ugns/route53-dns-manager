@@ -117,8 +117,8 @@ exports.handler = async (event) => {
   }
 
   if (method === 'DELETE') {
-    const { token, hostname } = body;
-    console.log('DELETE request body:', body);
+    const { token, hostname } = query;
+    console.log('DELETE request body:', query);
     if (!token || !hostname) {
       console.warn('Missing fields:', { token, hostname });
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing fields' }) };
