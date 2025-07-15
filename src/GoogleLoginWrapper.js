@@ -48,7 +48,13 @@ function GoogleLoginWrapper() {
               aria-label="Log out of Google session"
             >Log Out</button>
           </div>
-          <DnsForm token={token} />
+          <DnsForm
+            token={token}
+            onAuthError={() => {
+              setToken(null);
+              localStorage.removeItem('googleToken');
+            }}
+          />
         </>
       )}
     </GoogleOAuthProvider>
