@@ -72,7 +72,7 @@ function DnsForm({ token, onAuthError }) {
 
   useEffect(() => {
     if (message) {
-      const timer = setTimeout(() => setMessage(''), 3000); // 3 seconds
+      const timer = setTimeout(() => setMessage(''), 5000);
       return () => clearTimeout(timer);
     }
   }, [message]);
@@ -121,7 +121,21 @@ function DnsForm({ token, onAuthError }) {
             </span>
           </div>
         </div>
-        <button type="submit" className="btn btn-primary w-100">Create/Update</button>
+        <div className="row g-2">
+          <div className="col-9">
+            <button type="submit" className="btn btn-primary w-100">Create/Update</button>
+          </div>
+          <div className="col-3">
+            <button
+              type="button"
+              className="btn btn-outline-secondary w-100"
+              onClick={() => {
+                setDid('');
+                setHostname('');
+              }}
+            >Reset</button>
+          </div>
+        </div>
       </form>
       <div
         className={`toast align-items-center text-bg-info border-0 position-fixed top-0 start-50 translate-middle-x mt-3${message ? ' show' : ''}`}
@@ -146,48 +160,32 @@ function DnsForm({ token, onAuthError }) {
               </div>
             </div>
           ) : (
-            <ul className="list-group list-group-flush">
+            <div className="row g-3">
               {entries.map(e => (
-                <li
-                  key={e.hostname}
-                  className="list-group-item d-flex justify-content-between align-items-center"
-                >
-                  <span>@<strong>{e.hostname}</strong>.{DNS_DOMAIN}</span>
-                  <div className="btn-group" role="group">'
-                    <div className="dropdown">
+                <div className="col-12 mb-1" key={e.hostname}>
+                  <div className="card h-100 border-primary mx-2">
+                    <div className="card-body d-flex align-items-center justify-content-between">
+                      <span className="fs-6">@<strong>{e.hostname}</strong>.{DNS_DOMAIN}</span>
+                    </div>
+                    <div className="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
                       <button
-                        className="btn btn-outline-secondary btn-sm dropdown-toggle"
-                        type="button"
-                        id={`dropdownMenuButton-${e.hostname}`}
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        Actions
-                      </button>
-                      <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton-${e.hostname}`}>
-                        <li>
-                          <button
-                            className="dropdown-item"
-                            aria-label="Edit entry: Click to populate form for editing"
-                            onClick={() => {
-                              setHostname(e.hostname);
-                              setDid(e.did);
-                            }}
-                          >Edit</button>
-                        </li>
-                        <li>
-                          <button
-                            className="dropdown-item text-danger"
-                            aria-label={`Remove entry for ${e.hostname}`}
-                            onClick={() => handleRemove(e.hostname)}
-                          >Remove</button>
-                        </li>
-                      </ul>
+                        className="btn btn-outline-primary btn-sm"
+                        aria-label={`Edit entry for ${e.hostname}`}
+                        onClick={() => {
+                          setHostname(e.hostname);
+                          setDid(e.did);
+                        }}
+                      >Edit</button>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        aria-label={`Remove entry for ${e.hostname}`}
+                        onClick={() => handleRemove(e.hostname)}
+                      >Remove</button>
                     </div>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </div>
