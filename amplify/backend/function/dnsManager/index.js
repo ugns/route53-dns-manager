@@ -176,16 +176,31 @@ exports.handler = async (event) => {
       const ticket = await oauthClient.verifyIdToken({ idToken: token, audience: GOOGLE_CLIENT_ID });
       const user = ticket.getPayload();
       console.log('Authenticated user:', user);
-      const params = { HostedZoneId: HOSTED_ZONE_ID, MaxItems: '100', StartRecordType: 'TXT' };
-      const data = await route53.listResourceRecordSets(params);
-      console.log('Route53 listResourceRecordSets data:', data);
-      const userEntries = data.ResourceRecordSets
+      let allRecords = [];
+      let params = {
+        HostedZoneId: HOSTED_ZONE_ID,
+        MaxItems: '100',
+      };
+      let hasMore = true;
+      while (hasMore) {
+        const data = await route53.listResourceRecordSets(params);
+        allRecords = allRecords.concat(data.ResourceRecordSets);
+        if (data.NextRecordName) {
+          params.StartRecordName = data.NextRecordName;
+          if (data.NextRecordType) params.StartRecordType = data.NextRecordType;
+          if (data.NextRecordIdentifier) params.StartRecordIdentifier = data.NextRecordIdentifier;
+        } else {
+          hasMore = false;
+        }
+      }
+      console.log('Route53 all ResourceRecordSets count:', allRecords.length);
+      const userEntries = allRecords
         .filter(r => r.Type === 'TXT' && r.ResourceRecords.some(rec => rec.Value.replace(/^"|"$/g, '') === user.sub))
         .map(r => {
           const hostname = r.Name.replace(`.${DOMAIN}.`, '').replace(/\.$/, '');
           // Find the corresponding _atproto TXT record
           const atprotoName = `_atproto.${hostname}.${DOMAIN}.`;
-          const atprotoRecord = data.ResourceRecordSets.find(
+          const atprotoRecord = allRecords.find(
             rec => rec.Name === atprotoName && rec.Type === 'TXT'
           );
           let did = null;
