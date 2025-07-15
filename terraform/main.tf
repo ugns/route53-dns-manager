@@ -8,6 +8,7 @@ resource "aws_amplify_app" "website" {
   environment_variables = {
     REACT_APP_GOOGLE_CLIENT_ID = var.google_client_id
     REACT_APP_DNS_API_URL      = "${aws_api_gateway_stage.production.invoke_url}/api/dns"
+    REACT_APP_DNS_DOMAIN       = aws_route53_zone.this.name
   }
 }
 

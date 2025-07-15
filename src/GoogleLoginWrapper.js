@@ -12,14 +12,16 @@ function GoogleLoginWrapper() {
       {!token ? (
         <>
           <h2 className="mb-4 text-center">Manage Bluesky Handle DNS</h2>
-          <GoogleLogin
-            onSuccess={credentialResponse => {
-              setToken(credentialResponse.credential);
-            }}
-            onError={() => {
-              alert('Login Failed');
-            }}
-          />
+          <div className="d-flex justify-content-center">
+            <GoogleLogin
+              onSuccess={credentialResponse => {
+                setToken(credentialResponse.credential);
+              }}
+              onError={() => {
+                alert('Login Failed');
+              }}
+            />
+          </div>
         </>
       ) : (
         <DnsForm token={token} />

@@ -44,7 +44,7 @@ resource "aws_lambda_function" "dns_manager" {
     variables = {
       GOOGLE_CLIENT_ID = var.google_client_id
       HOSTED_ZONE_ID   = aws_route53_zone.this.zone_id
-      DNS_DOMAIN       = var.domain_name
+      DNS_DOMAIN       = aws_route53_zone.this.name
     }
   }
 }
