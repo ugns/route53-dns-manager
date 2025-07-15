@@ -8,6 +8,7 @@ const DOMAIN = process.env.DNS_DOMAIN;
 const oauthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 const route53 = new Route53();
 
+// Returns all TXT values for a record as an array of { Value: ... } objects, or [] if not found
 async function getTxtRecord(name) {
   const params = {
     HostedZoneId: HOSTED_ZONE_ID,
@@ -18,9 +19,9 @@ async function getTxtRecord(name) {
   const data = await route53.listResourceRecordSets(params);
   const record = data.ResourceRecordSets.find(r => r.Name.replace(/\.$/, '') === name && r.Type === 'TXT');
   if (record && record.ResourceRecords.length > 0) {
-    return record.ResourceRecords[0].Value.replace(/^"|"$/g, '');
+    return record.ResourceRecords.map(r => ({ Value: r.Value }));
   }
-  return null;
+  return [];
 }
 
 function isValidDidFormat(did) {
@@ -80,7 +81,8 @@ exports.handler = async (event) => {
       console.log('Authenticated user:', user);
       const fqdn = `${hostname}.${DOMAIN}`;
       const atprotoFqdn = `_atproto.${hostname}.${DOMAIN}`;
-      const ownerTxt = await getTxtRecord(fqdn);
+      const ownerTxtArr = await getTxtRecord(fqdn);
+      const ownerTxt = ownerTxtArr.length > 0 ? ownerTxtArr[0].Value.replace(/^"|"$/g, '') : null;
       console.log('Existing ownerTxt:', ownerTxt);
       if (ownerTxt && ownerTxt !== user.sub) {
         console.warn('Not authorized to update entry:', { ownerTxt, userSub: user.sub });
@@ -129,32 +131,42 @@ exports.handler = async (event) => {
       console.log('Authenticated user:', user);
       const fqdn = `${hostname}.${DOMAIN}`;
       const atprotoFqdn = `_atproto.${hostname}.${DOMAIN}`;
-      const ownerTxt = await getTxtRecord(fqdn);
+      const fqdnTxtRecords = await getTxtRecord(fqdn);
+      const ownerTxt = fqdnTxtRecords.length > 0 ? fqdnTxtRecords[0].Value.replace(/^"|"$/g, '') : null;
       console.log('Existing ownerTxt:', ownerTxt);
       if (!ownerTxt || ownerTxt !== user.sub) {
         console.warn('Not authorized or entry does not exist:', { ownerTxt, userSub: user.sub });
         return { statusCode: 403, headers: corsHeaders, body: JSON.stringify({ error: 'Not authorized or entry does not exist' }) };
       }
-      const changes = [
-        {
+      // Use getTxtRecord for both records
+      const atprotoTxtRecords = await getTxtRecord(atprotoFqdn);
+      const changes = [];
+      if (atprotoTxtRecords.length > 0) {
+        changes.push({
           Action: 'DELETE',
           ResourceRecordSet: {
             Name: atprotoFqdn,
             Type: 'TXT',
             TTL: 300,
-            ResourceRecords: [{ Value: `""` }],
+            ResourceRecords: atprotoTxtRecords,
           },
-        },
-        {
+        });
+      }
+      if (fqdnTxtRecords.length > 0) {
+        changes.push({
           Action: 'DELETE',
           ResourceRecordSet: {
             Name: fqdn,
             Type: 'TXT',
             TTL: 300,
-            ResourceRecords: [{ Value: `"${user.sub}"` }],
+            ResourceRecords: fqdnTxtRecords,
           },
-        },
-      ];
+        });
+      }
+      if (changes.length === 0) {
+        console.warn('No matching TXT records found to delete.');
+        return { statusCode: 404, headers: corsHeaders, body: JSON.stringify({ error: 'No matching TXT records found to delete.' }) };
+      }
       const params = { HostedZoneId: HOSTED_ZONE_ID, ChangeBatch: { Changes: changes } };
       console.log('Route53 change params:', params);
       await route53.changeResourceRecordSets(params);
