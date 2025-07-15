@@ -22,6 +22,12 @@ function DnsForm({ token }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    // Check if the values match an existing entry
+    const existing = entries.find(e => e.hostname === hostname);
+    if (existing && existing.did === did) {
+      setMessage('No changes detected. DNS entry not updated.');
+      return;
+    }
     try {
       await axios.post(API_URL, { token, did, hostname });
       setMessage('DNS entry created/updated!');
@@ -73,7 +79,7 @@ function DnsForm({ token }) {
         <div className="mb-3">
           <label htmlFor="handle-input" className="form-label">Desired Handle</label>
           <div className="input-group">
-            <span className="input-group-text bg-white border-end-0 fw-semibold" id="handle-addon">
+            <span className="input-group-text border-end-0 fw-semibold" id="handle-addon">
               {/* Bootstrap @ icon */}
               <i className="bi bi-at"></i>
             </span>
@@ -87,7 +93,7 @@ function DnsForm({ token }) {
               required
               aria-describedby="handle-addon domain-addon"
             />
-            <span className="input-group-text bg-white border-start-0 fw-semibold" id="domain-addon">
+            <span className="input-group-text border-start-0 fw-semibold" id="domain-addon">
               {process.env.REACT_APP_DNS_DOMAIN ? `.${process.env.REACT_APP_DNS_DOMAIN}` : '.yourdomain.com'}
             </span>
           </div>
@@ -98,9 +104,28 @@ function DnsForm({ token }) {
       <h3 className="mt-4">Your DNS Entries</h3>
       <ul className="list-group">
         {entries.map(e => (
-          <li key={e.hostname} className="list-group-item d-flex justify-content-between align-items-center">
+          <li
+            key={e.hostname}
+            className="list-group-item d-flex justify-content-between align-items-center"
+          >
             <span><strong>{e.hostname}</strong>: {e.did}</span>
-            <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(e.hostname)}>Remove</button>
+            <div className="btn-group" role="group">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                aria-label="Edit entry: Click to populate form for editing"
+                onClick={() => {
+                  setHostname(e.hostname);
+                  setDid(e.did);
+                }}
+              >Edit</button>
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-sm"
+                aria-label={`Remove entry for ${e.hostname}`}
+                onClick={() => handleRemove(e.hostname)}
+              >Remove</button>
+            </div>
           </li>
         ))}
       </ul>
