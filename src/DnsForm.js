@@ -163,8 +163,8 @@ function DnsForm({ token, onAuthError }) {
             <div className="row g-3">
               {entries.map(e => (
                 <div className="col-12 mb-1" key={e.hostname}>
-                  <div className="card h-100 border-primary mx-2">
-                    <div className="card-body d-flex align-items-center justify-content-between">
+                  <div className="card h-100 border-secondary-subtle mx-2">
+                    <div className="card-body d-flex align-items-center justify-content-between text-truncate">
                       <span className="fs-6">@<strong>{e.hostname}</strong>.{DNS_DOMAIN}</span>
                     </div>
                     <div className="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
