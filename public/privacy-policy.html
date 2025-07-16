@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container my-5">
+    <h1 class="mb-2">Privacy Policy</h1>
+    <p class="text-muted">Last updated: July 15, 2025</p>
+    <h2>Introduction</h2>
+    <p>We are committed to protecting your privacy and complying with the General Data Protection Regulation (GDPR). This Privacy Policy explains how we collect, use, and store your personal data when you use our DNS management application.</p>
+    <h2>Data Controller</h2>
+    <p>The data controller responsible for your personal data is the operator of this application. For any privacy-related inquiries, please contact us at the email address provided in the application's support section.</p>
+    <h2>What Data We Collect</h2>
+    <p>When you use our application, we authenticate you using Google Sign-In (GSI) with the <code>openid</code> scope. During authentication, we receive the following public Google profile information:</p>
+    <ul>
+      <li>Name</li>
+      <li>Email address</li>
+      <li>Profile photo</li>
+    </ul>
+    <p><strong>However, we do not store your name, email, or photo.</strong></p>
+    <p>The only information we store is your Google account's unique identifier (<code>sub</code>), which is a numerical ID provided by Google. This ID is used solely to link your DNS records (Route53 entries) with your account.</p>
+    <h2>How We Use Your Data</h2>
+    <ul>
+      <li><strong>Authentication:</strong> We use Google GSI to verify your identity and allow you to access the application.</li>
+      <li><strong>Record Ownership:</strong> We store your Google <code>sub</code> ID to associate Route53 DNS records you create or manage with your account.</li>
+    </ul>
+    <h2>Data Sharing and Transfers</h2>
+    <ul>
+      <li>We do not share your personal data with third parties, except as required by law or to operate the application (e.g., AWS Route53 for DNS management).</li>
+      <li>Your data is not transferred outside the European Economic Area (EEA) unless necessary for application operation and in compliance with GDPR safeguards.</li>
+    </ul>
+    <h2>Data Retention</h2>
+    <ul>
+      <li>We retain your Google <code>sub</code> ID only as long as you have DNS records managed through our application.</li>
+      <li>If you delete all your records or request account deletion, your <code>sub</code> ID will be removed from our system.</li>
+    </ul>
+    <h2>Your Rights</h2>
+    <p>Under GDPR, you have the right to:</p>
+    <ul>
+      <li>Access your personal data</li>
+      <li>Request correction or deletion of your data</li>
+      <li>Object to or restrict processing</li>
+      <li>Lodge a complaint with a supervisory authority</li>
+    </ul>
+    <p>To exercise your rights, please contact us via the application's support email.</p>
+    <h2>Security</h2>
+    <p>We implement appropriate technical and organizational measures to protect your data against unauthorized access, loss, or misuse.</p>
+    <h2>Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.</p>
+    <h2>Contact</h2>
+    <p>If you have any questions or concerns about this Privacy Policy or your data, please contact us using the support information provided in the application.</p>
+  </div>
+</body>
+</html>
