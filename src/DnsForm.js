@@ -8,6 +8,10 @@ function DnsForm({ token, onAuthError }) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Modal state for confirming removal
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingRemove, setPendingRemove] = useState(null); // { hostname, label }
+
   const API_URL = process.env.REACT_APP_DNS_API_URL;
   const DNS_DOMAIN = process.env.REACT_APP_DNS_DOMAIN || 'yourdomain.com';
 
@@ -68,6 +72,8 @@ function DnsForm({ token, onAuthError }) {
         setMessage(err.response?.data?.error || 'Error');
       }
     }
+    setShowConfirm(false);
+    setPendingRemove(null);
   };
 
   useEffect(() => {
@@ -123,7 +129,13 @@ function DnsForm({ token, onAuthError }) {
         </div>
         <div className="row g-2">
           <div className="col-9">
-            <button type="submit" className="btn btn-primary w-100">Create/Update</button>
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading}
+            >
+              {loading ? 'Processing...' : 'Create/Update'}
+            </button>
           </div>
           <div className="col-3">
             <button
@@ -133,6 +145,7 @@ function DnsForm({ token, onAuthError }) {
                 setDid('');
                 setHostname('');
               }}
+              disabled={loading}
             >Reset</button>
           </div>
         </div>
@@ -176,10 +189,20 @@ function DnsForm({ token, onAuthError }) {
                           setDid(e.did);
                         }}
                       >Edit</button>
+                      <a
+                        className="btn btn-outline-secondary btn-sm"
+                        href={`https://bsky-debug.app/handle?handle=${e.hostname}.${DNS_DOMAIN}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Debug handle ${e.hostname}.${DNS_DOMAIN} on Bluesky`}
+                      >Debug</a>
                       <button
                         className="btn btn-outline-danger btn-sm"
                         aria-label={`Remove entry for ${e.hostname}`}
-                        onClick={() => handleRemove(e.hostname)}
+                        onClick={() => {
+                          setPendingRemove({ hostname: e.hostname, label: `@${e.hostname}.${DNS_DOMAIN}` });
+                          setShowConfirm(true);
+                        }}
                       >Remove</button>
                     </div>
                   </div>
@@ -189,6 +212,26 @@ function DnsForm({ token, onAuthError }) {
           )}
         </div>
       </div>
+      {/* Remove Confirmation Modal */}
+      {showConfirm && (
+        <div className="modal fade show" tabIndex="-1" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }} role="dialog" aria-modal="true">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Confirm Removal</h5>
+                <button type="button" className="btn-close" aria-label="Close" onClick={() => { setShowConfirm(false); setPendingRemove(null); }}></button>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to remove <strong>{pendingRemove?.label}</strong>?</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowConfirm(false); setPendingRemove(null); }}>Cancel</button>
+                <button type="button" className="btn btn-danger" onClick={() => handleRemove(pendingRemove.hostname)}>Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
