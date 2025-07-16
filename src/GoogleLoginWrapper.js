@@ -16,7 +16,7 @@ function GoogleLoginWrapper() {
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       {!token ? (
         <>
-          <h2 className="mb-4 text-center">Manage Bluesky Handle DNS</h2>
+          <h2 className="mb-4 text-center">Manage Bluesky Custom Domain Handle</h2>
           <div className="d-flex justify-content-center">
             <GoogleLogin
               onSuccess={credentialResponse => {
@@ -32,6 +32,7 @@ function GoogleLoginWrapper() {
               itp_support={true}
               use_fedcm_for_button={true}
               use_fedcm_for_prompt={true}
+              useOneTap={true}
             />
           </div>
         </>
