@@ -35,9 +35,9 @@ function DnsForm({ token, onAuthError }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
-    // Check if the values match an existing entry
+    // Only block update if both hostname and did are unchanged
     const existing = entries.find(e => e.hostname === hostname);
-    if (existing && existing.did === did) {
+    if (existing && existing.did === did && existing.hostname === hostname) {
       setMessage('No changes detected. DNS entry not updated.');
       return;
     }
@@ -122,8 +122,8 @@ function DnsForm({ token, onAuthError }) {
               onInvalid={e => e.target.setCustomValidity('Please enter your desired handle (e.g. alice)')}
               onInput={e => e.target.setCustomValidity('')}
             />
-            <span className="input-group-text border-start-0 fw-semibold" id="domain-addon">
-              .{DNS_DOMAIN}
+            <span className="input-group-text border-start-0" id="domain-addon">
+              <strong>.{DNS_DOMAIN}</strong>
             </span>
           </div>
         </div>
@@ -150,19 +150,6 @@ function DnsForm({ token, onAuthError }) {
           </div>
         </div>
       </form>
-      <div
-        className={`toast align-items-center text-bg-info border-0 position-fixed top-0 start-50 translate-middle-x mt-3${message ? ' show' : ''}`}
-        role="alert"
-        aria-live="polite"
-        aria-atomic="true"
-        style={{ zIndex: 1055, minWidth: '250px' }}
-      >
-        <div className="d-flex">
-          <div className="toast-body w-100 text-center">
-            {message}
-          </div>
-        </div>
-      </div>
       <div className="card shadow-sm">
         <div className="card-header mb-3 h4 text-center">Your Handles</div>
         <div className="card-body p-0">
@@ -178,7 +165,7 @@ function DnsForm({ token, onAuthError }) {
                 <div className="col-12 mb-1" key={e.hostname}>
                   <div className="card h-100 border-secondary-subtle mx-2">
                     <div className="card-body d-flex align-items-center justify-content-between text-truncate">
-                      <span className="fs-6">@<strong>{e.hostname}</strong>.{DNS_DOMAIN}</span>
+                      <span className="fs-5">@<strong>{e.hostname}</strong>.{DNS_DOMAIN}</span>
                     </div>
                     <div className="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
                       <button
@@ -210,6 +197,19 @@ function DnsForm({ token, onAuthError }) {
               ))}
             </div>
           )}
+        </div>
+      </div>
+      <div
+        className={`toast align-items-center text-bg-info border-0 position-fixed top-0 start-50 translate-middle-x mt-3${message ? ' show' : ''}`}
+        role="alert"
+        aria-live="polite"
+        aria-atomic="true"
+        style={{ zIndex: 1055, minWidth: '250px' }}
+      >
+        <div className="d-flex">
+          <div className="toast-body w-100 text-center">
+            {message}
+          </div>
         </div>
       </div>
       {/* Remove Confirmation Modal */}
