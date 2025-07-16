@@ -29,7 +29,7 @@ customHeaders:
           https://accounts.google.com/gsi/; font-src 'self' https://fonts.gstatic.com;
           frame-src 'self' https://accounts.google.com/gsi/; img-src 'self'
           https://www.google.com https://lh3.googleusercontent.com; style-src
-          'self' https://accounts.google.com/gsi/style;
+          'self' https://accounts.google.com/gsi/style https://cdn.jsdelivr.net/;
       - key: Content-Security-Policy-Report-Only
         value: default-src 'self' https://accounts.google.com/gsi/; script-src 'self'
           https://accounts.google.com/gsi/client https://ssl.gstatic.com;
@@ -38,4 +38,4 @@ customHeaders:
           https://accounts.google.com/gsi/; font-src 'self' https://fonts.gstatic.com;
           frame-src 'self' https://accounts.google.com/gsi/; img-src 'self'
           https://www.google.com https://lh3.googleusercontent.com; style-src
-          'self' https://accounts.google.com/gsi/style;
+          'self' https://accounts.google.com/gsi/style https://cdn.jsdelivr.net/;
